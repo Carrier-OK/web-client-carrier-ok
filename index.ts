@@ -59,13 +59,19 @@ const init = async () => {
     const updateUI = (data: CarrierData) => {
         targets.forEach((target) => {
             let val = data[String((<Element>target).getAttribute(ATTR_TARGET_NAME))];
-            if (val.toLowerCase() === "false" || "true") {
+            console.log({ val })
+            if (val === undefined || val === null) {
+                val = "No data";
+            }
+            val = val.toString()
+            if (val.toLowerCase() === "false" || val.toLowerCase() === "true") {
                 val = val.toLowerCase();
                 val = "false" ? "NO" : "YES";
             }
             if (val === "") {
                 val = "No data"
             }
+            console.log({ 'val after processing': val })
             target.textContent = val;
         });
     };
