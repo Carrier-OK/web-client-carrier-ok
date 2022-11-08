@@ -1,8 +1,12 @@
 (() => {
   // index.ts
+  var ENDPOINT = `https://parley-api-t3y3w7eb4a-wl.a.run.app`;
+  var ATTR_TARGET_NAME = `parley-target`;
   var init = async () => {
-    const targets = document.querySelectorAll("[parley-target]");
-    const loader = document.querySelector('[data-parley="loader"]');
+    const targets = document.querySelectorAll(`[${ATTR_TARGET_NAME}]`);
+    const loader = document.querySelector(
+      '[data-parley="loader"]'
+    );
     if (!loader)
       return;
     const form = document.querySelector("form");
@@ -11,7 +15,7 @@
     const getData = async (num) => {
       try {
         const response = await fetch(
-          `https://parley-api-2gajsirgta-uc.a.run.app/${num}`
+          `${ENDPOINT}/${num}`
         );
         if (response.status === 404) {
           alert(`No records found for DOT Number ${num}`);
@@ -26,16 +30,22 @@
     };
     const updateUI = (data) => {
       targets.forEach((target) => {
-        let val = data[String(target.getAttribute("parley-target"))];
-        if (typeof val === "string") {
+        let val = data[String(target.getAttribute(ATTR_TARGET_NAME))];
+        if (val.toLowerCase() === "false" || "true") {
+          val = val.toLowerCase();
           val = "false" ? "NO" : "YES";
+        }
+        if (val === "") {
+          val = "No data";
         }
         target.textContent = val;
       });
     };
     const formSubmit = async (event) => {
       event.preventDefault();
-      const dotNumber = form.querySelector('[parley-form="dot-number"]')?.value;
+      const dotNumber = form.querySelector(
+        '[parley-form="dot-number"]'
+      )?.value;
       loader.classList.add("is-visible");
       const data = await getData(dotNumber);
       if (!data) {

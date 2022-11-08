@@ -1,0 +1,28 @@
+{
+  "name": "web-client-carrier-ok",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "esbuild": "^0.15.13",
+    "prettier": "^2.7.1",
+    "serve": "^14.0.1",
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "serve",
+    "build": "esbuild index.ts --bundle --sourcemap --outdir=dist",
+    "format": "prettier index.ts -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Carrier-OK/web-client-carrier-ok.git"
+  },
+  "author": "Carrier-OK!",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Carrier-OK/web-client-carrier-ok/issues"
+  },
+  "homepage": "https://github.com/Carrier-OK/web-client-carrier-ok#readme"
+}
