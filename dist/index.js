@@ -31,7 +31,6 @@
     const updateUI = (data) => {
       targets.forEach((target) => {
         let val = data[String(target.getAttribute(ATTR_TARGET_NAME))];
-        console.log({ val });
         if (val === void 0 || val === null) {
           val = "No data";
         }
@@ -43,7 +42,6 @@
         if (val === "") {
           val = "No data";
         }
-        console.log({ "val after processing": val });
         target.textContent = val;
       });
     };
