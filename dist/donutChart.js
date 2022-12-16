@@ -9009,7 +9009,7 @@
     if (!ctx) {
       return;
     }
-    const donutChart2 = new Chart(ctx, {
+    const donutChart = new Chart(ctx, {
       type: "doughnut",
       data: {
         labels: [],
@@ -9028,175 +9028,15 @@
         responsive: false
       }
     });
-    return donutChart2;
+    return donutChart;
   };
-  var updateDonutChart = (donutChart2, score) => {
+  var updateDonutChart = (donutChart, score) => {
     let diff = 100 - score;
-    donutChart2.data.datasets[0].data.pop();
-    donutChart2.data.datasets[0].data.pop();
-    donutChart2.data.datasets[0].data.push(score, diff);
-    donutChart2.update();
+    donutChart.data.datasets[0].data.pop();
+    donutChart.data.datasets[0].data.pop();
+    donutChart.data.datasets[0].data.push(score, diff);
+    donutChart.update();
   };
-
-  // src/index.ts
-  var ENDPOINT = `https://parley-api-t3y3w7eb4a-wl.a.run.app`;
-  var ATTR_TARGET_NAME = `parley-target`;
-  var sanitizeData = (data) => {
-    for (let property in data) {
-      if (data[property] === "false") {
-        data[property] = false;
-      }
-      if (data[property] === "true") {
-        data[property] = true;
-      }
-    }
-    return data;
-  };
-  var donutChart;
-  var init = async () => {
-    donutChart = createDonutChart(75);
-    console.log("loaded");
-    const targets = document.querySelectorAll(`[${ATTR_TARGET_NAME}]`);
-    const loader = document.querySelector(
-      '[data-parley="loader"]'
-    );
-    if (!loader)
-      return;
-    const form = document.querySelector("form");
-    if (!form)
-      return;
-    const getData = async (num) => {
-      try {
-        const response = await fetch(`${ENDPOINT}/${num}`);
-        if (response.status === 404) {
-          alert(`No records found for DOT Number ${num}`);
-          return null;
-        }
-        const data = await response.json();
-        const sanitizedData = sanitizeData(data);
-        return sanitizedData;
-      } catch (error) {
-        console.log({ error });
-        return null;
-      }
-    };
-    const formatValue = (target, propName, val) => {
-      const currencyFormatter = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      });
-      const decimalFormatter = new Intl.NumberFormat("en-US", {
-        style: "decimal",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      });
-      const propNameSplit = propName.split("_");
-      if (val === void 0 || val === null) {
-        val = "No data";
-      } else if (propNameSplit.length > 0 && propNameSplit[0] === "hyperlink") {
-        val = encodeURI(val);
-      } else if (propName === "mismatched_physical_address" /* mismatched_physical_address */) {
-        console.log("verifying physical address: ", val);
-        if (!val) {
-          target.querySelector(`[parley-ui="${"verified" /* verified */}"]`)?.classList.remove("hide");
-          target.querySelector(`[parley-ui="${"unverified" /* unverified */}"]`)?.classList.add("hide");
-        } else {
-          target.querySelector(`[parley-ui="${"unverified" /* unverified */}"]`)?.classList.remove("hide");
-          target.querySelector(`[parley-ui="${"verified" /* verified */}"]`)?.classList.add("hide");
-        }
-        return null;
-      } else if (propName === "mcs150_milage" /* mcs150_milage */) {
-        val = decimalFormatter.format(val);
-      } else if (propName === "carrier_score" /* carrier_score */) {
-        updateDonutChart(donutChart, val);
-      } else if (propName === "mcs150_date" /* mcs150_date */) {
-        val = new Date(val);
-        val = `(${val.getFullYear()})`;
-        console.log({ val });
-      } else if (propName === "authorized_cargo_string" /* authorized_cargo_string */) {
-        val = val.replace(/,/g, " | ");
-      } else if (propName === "insurance_bipd_on_file" /* insurance_bipd_on_file */ || propName === "insurance_cargo_on_file" /* insurance_cargo_on_file */) {
-        val = currencyFormatter.format(val);
-      } else if (propName === "authority_date" /* authority_date */) {
-        val = new Date(val);
-        val = val.toISOString().split("T")[0];
-      } else if (propName === "low_ratio_inspections_to_age" /* low_ratio_inspections_to_age */ || propName === "low_ratio_inspections_to_power_units" /* low_ratio_inspections_to_power_units */ || propName === "low_ratio_power_units_to_drivers" /* low_ratio_power_units_to_drivers */ || propName === "partial_contact_info" /* partial_contact_info */ || propName === "shares_address" /* shares_address */ || propName === "shares_contact_info" /* shares_contact_info */ || propName === "mc_cluster" /* mc_cluster */) {
-        target.classList.remove("hide");
-        if (!val) {
-          target.classList.add("hide");
-        }
-        return null;
-      }
-      if (val === false) {
-        val = "NO";
-      }
-      if (val === true) {
-        val = "YES";
-      }
-      val = val.toString();
-      if (propName === "telephone_number" || propName === "cellphone_number" || propName === "fax_number") {
-        if (val.length === 10) {
-          val = formatPhoneNumber(val);
-        }
-      }
-      if (val === "") {
-        val = "No data";
-      }
-      return val;
-    };
-    const updateUI = (data) => {
-      targets.forEach((target) => {
-        let el = target;
-        let val = data[String(el.getAttribute(ATTR_TARGET_NAME))];
-        let propName = el.getAttribute(ATTR_TARGET_NAME);
-        if (!propName)
-          return;
-        let formattedVal = formatValue(target, propName, val);
-        if (formattedVal === "Active" || formattedVal === "Satisfactory" || formattedVal === "LOW") {
-          target.classList.add("green-glow");
-          formattedVal = formattedVal.toUpperCase();
-        } else {
-          target.classList.remove("green-glow");
-        }
-        const propNameSplit = propName.split("_");
-        if (propNameSplit.length > 0 && propNameSplit[0] === "hyperlink") {
-          target.href = formattedVal;
-        } else {
-          if (formattedVal === null)
-            return;
-          target.textContent = formattedVal;
-        }
-      });
-    };
-    const formSubmit = async (event) => {
-      event.preventDefault();
-      const dotNumber = form.querySelector(
-        '[parley-form="dot-number"]'
-      )?.value;
-      loader.classList.add("is-visible");
-      const data = await getData(dotNumber);
-      if (!data) {
-        console.log("error getting carrier data!");
-      } else {
-        updateUI(data);
-      }
-      setTimeout(() => {
-        loader.classList.remove("is-visible");
-      }, 1e3);
-    };
-    form.addEventListener("submit", formSubmit);
-  };
-  function formatPhoneNumber(phoneNumberString) {
-    var cleaned = ("" + phoneNumberString).replace(/\D/g, "");
-    var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-    if (match) {
-      return "(" + match[1] + ") " + match[2] + "-" + match[3];
-    }
-    return null;
-  }
-  document.addEventListener("DOMContentLoaded", init);
 })();
 /*!
  * @kurkle/color v0.3.1
@@ -9210,4 +9050,4 @@
  * (c) 2022 Chart.js Contributors
  * Released under the MIT License
  */
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=donutChart.js.map
